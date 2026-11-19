@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+</head>
+<body>
+<title>Lernstand-Check 5. Semester</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap">
+<style>
+/* Layout: one question per screen like a slide deck; fixed bottom bar with progress bar and back/next. */
+:root{
+  --bg:#f1f4f1; --card:#ffffff; --ink:#1b211d; --muted:#5a645d; --line:#d3dcd5;
+  --accent:#1f7a4d; --accent-soft:#dcefe3; --accent-ink:#145236;
+  --good:#1f7a4d; --mid:#a86a00; --bad:#b42323;
+  --display:'Barlow Condensed','Arial Narrow',sans-serif; --body:'Barlow',system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#141916; --card:#1d241f; --ink:#e8eee9; --muted:#9faba2; --line:#33403a;
+  --accent:#4fc888; --accent-soft:#16352a; --accent-ink:#9fe6bf;
+  --good:#6fd39c; --mid:#f0c060; --bad:#ff8a8a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141916; --card:#1d241f; --ink:#e8eee9; --muted:#9faba2; --line:#33403a;
+  --accent:#4fc888; --accent-soft:#16352a; --accent-ink:#9fe6bf;
+  --good:#6fd39c; --mid:#f0c060; --bad:#ff8a8a; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5}
+.stage{min-height:100%;display:flex;flex-direction:column;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 150px}
+.slide{max-width:620px;width:100%;margin:auto;display:flex;flex-direction:column;gap:18px}
+@media (prefers-reduced-motion:no-preference){.slide{animation:in .28s ease-out}@keyframes in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}}
+h1,h2,h3{font-family:var(--display);font-weight:700;margin:0;text-wrap:balance;letter-spacing:.01em}
+h1{font-size:clamp(2.4rem,9vw,3.4rem);line-height:.95}
+h2{font-size:clamp(1.6rem,6vw,2.2rem);line-height:1.05}
+h3{font-size:1.2rem}
+p{margin:0}
+.eyebrow{font-size:.76rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.tag{align-self:flex-start;font-family:var(--display);font-size:.85rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-ink);background:var(--accent-soft);padding:3px 10px;border-radius:4px}
+.lead{color:var(--muted)}
+.hint{font-size:.88rem;color:var(--muted)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.spur-h{font-family:var(--display);font-size:.95rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:.95rem;padding:9px 14px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;display:inline-flex;gap:6px;align-items:baseline}
+.chip small{font-family:var(--display);color:var(--muted);font-size:.82rem}
+.chip[aria-pressed="true"]{border-color:var(--accent);background:var(--accent);color:#fff}
+.chip[aria-pressed="true"] small{color:#fff}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.lz{border-left:4px solid var(--accent);padding:2px 0 2px 14px;border-radius:0}
+.lz b{font-family:var(--display);font-size:1rem;letter-spacing:.05em}
+.meta{display:flex;flex-wrap:wrap;gap:6px}
+.pill{font-size:.8rem;padding:3px 9px;border-radius:4px;background:var(--card);border:1px solid var(--line);color:var(--muted)}
+.ol{display:flex;flex-direction:column;gap:10px;margin:0;padding:0;list-style:none}
+.ol li{display:flex;gap:12px;align-items:center}
+.k{flex:0 0 auto;font-family:var(--display);font-weight:700;font-size:1rem;line-height:1;padding:7px 8px;border-radius:6px;background:var(--ink);color:var(--card);text-align:center;min-width:52px}
+.k small{display:block;font-size:.62rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-top:3px}
+.k.extra{background:transparent;color:var(--ink);border:1.5px solid var(--ink)}
+.kbig{display:flex;gap:14px;align-items:center}
+.kbig .k{font-size:1.4rem;min-width:70px;padding:10px}
+.kbig h2{font-size:clamp(1.35rem,5.2vw,2rem)}
+.big{font-family:var(--display);font-weight:700;font-size:clamp(5rem,26vw,8rem);line-height:.9;text-align:center;font-variant-numeric:tabular-nums}
+.big.unset{color:var(--line)}
+.word{text-align:center;font-weight:600;min-height:1.5em}
+input[type=range]{width:100%;accent-color:var(--accent);height:36px;margin:0}
+.untouched input[type=range]{opacity:.5}
+.ticks{display:flex;justify-content:space-between;font-family:var(--display);font-size:.9rem;color:var(--muted);padding:0 6px}
+.c-good{color:var(--good)} .c-mid{color:var(--mid)} .c-bad{color:var(--bad)}
+svg text{font-family:var(--display);fill:var(--ink)}
+.grid-l{fill:none;stroke:var(--line)}
+.grid-4{fill:none;stroke:var(--muted);stroke-dasharray:4 4}
+.area{fill:var(--accent);fill-opacity:.25;stroke:var(--accent);stroke-width:2.5;stroke-linejoin:round}
+.pt{fill:var(--accent)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px;text-align:center}
+.stat b{display:block;font-family:var(--display);font-size:1.7rem;line-height:1;font-variant-numeric:tabular-nums}
+.stat span{font-size:.75rem;color:var(--muted)}
+.ff{border-left:4px solid var(--accent);padding:4px 0 4px 14px;display:flex;flex-direction:column;gap:8px}
+.ff .src{font-size:.86rem;color:var(--muted)}
+.seg{display:flex;flex-direction:column;gap:10px}
+.seg button{font:inherit;font-size:1.1rem;font-weight:600;padding:16px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+textarea{width:100%;font:inherit;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);min-height:140px;resize:vertical}
+.ticket{border:2px dashed var(--ink);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:6px;background:var(--card)}
+.ticket .row{display:flex;justify-content:space-between;gap:12px;font-variant-numeric:tabular-nums;border-bottom:1px dotted var(--line);padding-bottom:4px}
+.ticket .row span:first-child{color:var(--muted)}
+.ticket .row span:last-child{text-align:right}
+.btn{font:inherit;font-weight:600;padding:12px 18px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn:disabled{opacity:.35;cursor:default}
+#copied{font-size:.9rem;color:var(--good)}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);z-index:5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-top:10px;padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))}
+.bar-in{max-width:620px;margin:0 auto;display:flex;flex-direction:column;gap:8px}
+.prog-top{display:flex;justify-content:space-between;font-size:.82rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.prog-top b{color:var(--ink);font-family:var(--display);letter-spacing:.06em;text-transform:uppercase;font-size:.9rem}
+.track{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.fill{height:100%;background:var(--accent);border-radius:99px;transition:width .3s}
+.nav{display:flex;gap:10px;justify-content:space-between;align-items:center}
+.nav .btn.primary{flex:1;max-width:260px;margin-left:auto}
+#err{font-size:.86rem;color:var(--bad);min-height:1.2em;text-align:right}
+.tw{overflow-x:auto}
+table.info{width:100%;border-collapse:collapse;min-width:380px;font-size:.9rem}
+table.info td{border-top:1px solid var(--line);padding:6px 4px;vertical-align:top}
+table.info td:first-child{font-weight:600;white-space:nowrap}
+details summary{cursor:pointer;font-weight:600;font-size:.92rem}
+.rs{display:flex;flex-direction:column;gap:2px;padding:10px 0 4px;border-top:1px solid var(--line)}
+.rs:first-of-type{border-top:0}
+.rh{display:flex;gap:10px;align-items:center}
+.rh .k{min-width:44px;padding:5px 6px;font-size:.85rem}
+.rl{flex:1;font-size:.95rem;line-height:1.3}
+.rv{font-family:var(--display);font-weight:700;font-size:1.8rem;line-height:1;min-width:46px;text-align:right;font-variant-numeric:tabular-nums}
+.rv.unset{color:var(--line)}
+.scale{display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted);font-family:var(--display);letter-spacing:.04em}
+.tl{font-weight:600;margin-top:4px}
+.tx textarea{min-height:80px}
+</style>
+
+<main class="stage"><div id="slide" class="slide" aria-live="polite"></div></main>
+<nav class="bar" aria-label="Fortschritt">
+  <div class="bar-in">
+    <div class="prog-top"><b id="sec">Start</b><span id="count">1 / 1</span></div>
+    <div class="track" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="track"><div class="fill" id="fill" style="width:0"></div></div>
+    <div id="err" aria-live="assertive"></div>
+    <div class="nav">
+      <button class="btn" type="button" id="back">Zurück</button>
+      <button class="btn primary" type="button" id="next">Weiter</button>
+    </div>
+  </div>
+</nav>
+
+<script>
+const KN={1:"Wissen",2:"Verstehen",3:"Anwenden"};
+/* g: [K-Stufe, Kurzlabel, Lernziel, Inhalte laut Lehrplan, nächster Schritt] */
+const T=[
+ {id:"mm",spur:"A",nr:"4.5.10",name:"Motormanagement Otto",lek:"34 Lekt. + 5 HA",pr:"Prüfung an Termin 15 (mit 4.5.11)",
+  lz:"beschreiben die Aufgabe und den Aufbau des Motormanagements des Ottomotors",src:"Dossier 4.5.10 · Europa Lernfeld 8, S. 117–125",
+  g:[[1,"Energieträger","Ich kann verschiedene Energieträger nennen und erneuerbare von nicht erneuerbaren unterscheiden.","Benzin, Ethanol, Diesel, CNG (Erdgas, Biogas), LPG, Wasserstoff",
+      "Schreib alle Energieträger auf eine Karte und markiere, welche erneuerbar sind. Kontrolliere mit dem Dossier."],
+     [2,"Kraftstoffanlage","Ich kann Aufgabe und Aufbau der Kraftstoffanlage beschreiben.","Tank, Fördereinheit, Filter, Leitungen, Rail, Hochdruckpumpe, Injektor",
+      "Bezeichne im Dossier alle Bauteile vom Tank bis zum Injektor und schreib zu jedem die Aufgabe in einem Satz."],
+     [2,"Gemisch & Lambda","Ich kann Gemischzusammensetzung, Lambda, Verbrennung und Oktanzahl erklären.","stöchiometrisch, fett, mager · Betriebszustände zuordnen · Klopffestigkeit",
+      "Mach eine Tabelle mit den Betriebszuständen (Kaltstart bis Schub) und ordne jedem fett, mager oder Lambda 1 zu."],
+     [2,"Einspritzung","Ich kann Saugrohr- und Direkteinspritzung mit Sensoren und Aktoren beschreiben.","Zündspule, Zündkabel, Zündkerzen · Systembild und Schaltplan lesen",
+      "Vergleiche die beiden Systembilder im Dossier und schreib drei Unterschiede in eine Tabelle."],
+     [3,"Arbeit & Energie","Ich kann Arbeit, Leistung und Energie berechnen.","W = F · s, W = P · t · Einheiten J, kJ, Nm, Ws, kWh",
+      "Rechne die Übungen zu Arbeit und Leistung nochmals und schreib bei jedem Schritt die Einheit dazu."]]},
+ {id:"ms",spur:"A",nr:"1.3.09",name:"Motorsteuerung",lek:"13 Lekt. + 2 HA",pr:"Prüfung an Termin 20",
+  lz:"beschreiben die Aufgabe, den Aufbau und die Funktion der Motorsteuerung",src:"Dossier 1.3.09 · Repetitionsfragen",
+  g:[[2,"Aufgabe","Ich kann die Aufgabe der Motorsteuerung beschreiben.","Gaswechsel, Ventile im richtigen Zeitpunkt öffnen und schliessen",
+      "Erklär einer Kollegin in drei Sätzen, wozu die Motorsteuerung da ist. Sie fragt zweimal nach."],
+     [2,"Antriebe","Ich kann Stirnrad-, Ketten- und Zahnriemenantrieb beschreiben.","Aufbau, Vor- und Nachteile, Spannvorrichtungen",
+      "Mach eine Tabelle zu den drei Antrieben mit je einem Vor- und Nachteil."],
+     [2,"Nockenwelle & Ventile","Ich kann Nockenwelle und Ventile beschreiben.","Nockenwellenanordnung, Ventilbauarten, Ventilüberschneidung",
+      "Ordne die Bilder im Dossier den Anordnungen OHV, OHC und DOHC zu."],
+     [2,"Ventilspiel","Ich kann das Ventilspiel und die Auswirkungen bei falschem Spiel beschreiben.","zu klein: Ventil schliesst nicht · zu gross: Geräusch, weniger Füllung",
+      "Mach eine Tabelle zu Ventilspiel zu klein und zu gross: Symptom, Folge."],
+     [2,"Steuerzeiten","Ich kann Steuerzeiten im Steuerdiagramm beschreiben.","Einlass und Auslass öffnet / schliesst, °KW",
+      "Lies zwei Steuerdiagramme aus dem Dossier und beschreib jeden Steuerzeitpunkt in einem Satz."]]},
+ {id:"kue",spur:"A",nr:"4.5.05",name:"Kühlsystem",lek:"8 Lekt. + 2 HA",pr:"Prüfung nach Termin 20, separat",
+  lz:"beschreiben die Aufgabe, den Aufbau und die Funktion des Kühlsystems",src:"Dossier 4.5.05 · Repetitionsfragen Kühlung",
+  g:[[2,"Aufgabe","Ich kann Aufgabe und Aufbau des Kühlsystems beschreiben.","kleiner und grosser Kreislauf",
+      "Markiere im Systembild den kleinen Kreislauf blau und den grossen rot."],
+     [2,"Kühler & Deckel","Ich kann Kühler, Kühlerdeckel und Wärmetauscher beschreiben.","Überdruck hebt den Siedepunkt",
+      "Erklär in zwei Sätzen, warum der Kühlerdeckel einen Überdruck hält."],
+     [2,"Pumpe & Thermostat","Ich kann Wasserpumpe und Thermostat beschreiben.","geregelt, ungeregelt · Dehnstoffelement, kennfeldgesteuert",
+      "Zeichne den Thermostat geschlossen und offen und beschrifte das Dehnstoffelement."],
+     [2,"Lüfter & Jalousie","Ich kann Elektro- und Viscolüfter sowie die Kühlerjalousie beschreiben.","Ansteuerung, Funktion, Spritsparen",
+      "Fahr im Schaltplan des Kühllüfters den Stromlauf nach und schreib auf, wann er läuft."],
+     [2,"Sensoren","Ich kann Temperatursensoren und -schalter beschreiben.","NTC, Schalter, Schaltplan lesen",
+      "Schreib zu Sensor und Schalter je einen Satz: Was misst er, wohin geht das Signal?"]]},
+ {id:"sch",spur:"A",nr:"4.5.07",name:"Motorschmierung",lek:"9 Lekt. + 1 HA",pr:"Fortsetzung im 6. Semester",
+  lz:"beschreiben die Aufgabe und den Aufbau der Motorschmierung",src:"Dossier 4.5.07 · Repetition Motorschmierung",
+  g:[[2,"Aufgabe","Ich kann die Aufgaben der Motorschmierung beschreiben.","schmieren, kühlen, abdichten, reinigen, Korrosionsschutz",
+      "Schreib die Aufgaben auswendig auf und kontrolliere mit dem Dossier."],
+     [2,"Pumpe & Filter","Ich kann Ölpumpe und Ölfilter beschreiben.","Bauarten, Anordnung, Aufbau",
+      "Fahr den Ölweg im Dossierbild von der Wanne bis zum Lager nach."],
+     [2,"Ventile","Ich kann die Regelventile und die Kolbenspritzdüse beschreiben.","Überdruck-, Rückschlag-, Umgehungsventil",
+      "Schreib zu jedem Ventil, wann es öffnet und was ohne es passieren würde."],
+     [2,"Sensoren","Ich kann Druckschalter und die Ölsensoren beschreiben.","Druck-, Güte-, Niveau-, Temperatursensor",
+      "Lies den Schaltplan der Öldrucküberwachung und schreib auf, wann die Warnlampe leuchtet."],
+     [2,"Wärmetauscher","Ich kann Ölkühler und Wärmetauscher beschreiben.","Leitungen, Einbauort, bildliche Darstellungen",
+      "Erklär einem Kollegen, warum Motoröl gekühlt werden muss."]]},
+ {id:"zk",spur:"B",nr:"1.3.06",name:"Zündkerzen",lek:"5 Lekt.",pr:"Prüfung an Termin 5",
+  lz:"erklären den Aufbau, die Aufgaben und die Eigenschaften von Zündkerzen",src:"Fachbuch Kapitel Zündkerze · Werkstattdaten",
+  g:[[2,"Aufbau","Ich kann den Aufbau einer Zündkerze erklären.","Anschluss, Isolator, Gehäuse, Dichtring, Elektroden",
+      "Zeichne eine Zündkerze im Schnitt und beschrifte alle Teile."],
+     [2,"Aufgaben","Ich kann Aufgaben und Eigenschaften der Zündkerze erklären.","Funken, Abdichtung, Wärmeableitung",
+      "Schreib drei Aufgaben der Zündkerze auf und erklär jede mit einem Satz."],
+     [2,"Wärmewert","Ich kann den Wärmewert erklären.","heisse und kalte Kerze, Selbstreinigungstemperatur",
+      "Erklär einer Kollegin, warum ein Sportmotor eine kältere Kerze braucht."],
+     [3,"Austausch","Ich kann eine Zündkerze fachgerecht austauschen.","Elektrodenabstand, Anzugsdrehmoment, Herstellerangaben",
+      "Schreib die Arbeitsschritte für den Kerzenwechsel auf, mit Drehmoment nach Herstellerangabe."]]},
+ {id:"rie",spur:"B",nr:"1.3.10",name:"Riemenarten",lek:"3 Lekt.",pr:"Prüfung an Termin 6",
+  lz:"erklären Riemenarten, Dimensionen und Spannvorrichtungen",src:"Fachbuch Kapitel Riementriebe · Teilekatalog",
+  g:[[2,"Riemenarten","Ich kann Zahn- und Mehrrippenriemen erklären.","Aufbau, Einsatz, Unterschiede",
+      "Ordne Fotos von Riemen der richtigen Art zu und nenne je einen Einsatzort."],
+     [2,"Dimensionen","Ich kann die Dimensionen und Bezeichnungen von Riemen erklären.","z. B. 6PK1070: Rippen, Profil, Länge",
+      "Entschlüssle drei Riemenbezeichnungen aus einem Teilekatalog."],
+     [2,"Spannrollen","Ich kann exzentrische und federbelastete Spannrollen erklären.","Funktion, Einstellung, Unterschiede",
+      "Skizziere beide Spannrollen und markiere, woher die Spannkraft kommt."]]},
+ {id:"gel",spur:"B",nr:"2.5.05",name:"Gelenke / Antriebsstrang",lek:"5 Lekt.",pr:"Prüfung an Termin 9",
+  lz:"benennen Gelenkarten und erklären die Aufgabe und Eigenschaften von Gelenken, dem Kardanwellenmittellager und beschreiben die Einsatzgebiete",src:"Fachbuch Kapitel Gelenkwellen",
+  g:[[1,"Gelenkarten","Ich kann die Gelenkarten benennen.","Hardyscheibe, Gummigelenk, Kreuzgelenk",
+      "Mach Lernkarten: vorne das Bild des Gelenks, hinten der Name."],
+     [2,"Eigenschaften","Ich kann Aufgabe und Eigenschaften der Gelenke erklären.","kinetisch und homokinetisch",
+      "Erklär mit zwei Stiften, warum ein einzelnes Kreuzgelenk ungleichförmig dreht."],
+     [2,"Mittellager","Ich kann das Kardanwellenmittellager erklären.","Aufgabe, Aufbau, Schadensbild",
+      "Zeichne eine zweiteilige Kardanwelle und markiere, wo und warum das Mittellager sitzt."],
+     [2,"Einsatzgebiete","Ich kann die Einsatzgebiete der Gelenke beschreiben.","Kardanwelle, Antriebswelle, Lenkung",
+      "Zeichne den Antriebsstrang eines Heck- und eines Frontantriebs und trag die Gelenke ein."]]},
+ {id:"br",spur:"B",nr:"2.2.06",name:"Scheiben-/Trommelbremsen",lek:"3 Lekt.",pr:"Prüfung an Termin 10",
+  lz:"erklären den Aufbau von Scheiben- und Trommelbremsen sowie die Aufgabe deren Bauteile",src:"Lernskript 2.2.06 · Dossier Bremsen S. 5–27 · hep Mathematik",
+  g:[[2,"Scheibenbremse","Ich kann den Aufbau der Scheibenbremse und ihrer Bauteile erklären.","belüftet und unbelüftet, Faust- und Festsattel",
+      "Löse die Kontrollfragen 9 bis 13 im Lernskript ohne Hilfsmittel."],
+     [2,"Trommelbremse","Ich kann Simplex- und Duo-Servo-Bremse erklären.","Bauteile, Selbstverstärkung",
+      "Löse die Kontrollfragen 1 bis 4 im Lernskript ohne Hilfsmittel."],
+     [2,"Nachstellung","Ich kann Ein- und Nachstellvorrichtungen und die integrierte Topfbremse erklären.","automatische Nachstellung, Lüftspiel",
+      "Löse die Kontrollfragen 5 bis 8, 14 und 15 im Lernskript."],
+     [2,"Reibung","Ich kann Reibungsarten mit Beispielen und die Begriffe Normalkraft, Reibkraft, Reibwert und Schlupf erklären.","Haft-, Gleit-, Rollreibung",
+      "Löse die Kontrollfragen 16 bis 19 und schreib zu jeder Reibungsart ein Beispiel aus dem Auto."],
+     [3,"Rechnen","Ich kann mit FR = μ · FN und FU = C · FSp rechnen.","hep Mathematik 4.7 (S. 39) und 13.3 (S. 89)",
+      "Rechne die Kontrollfragen 20 bis 23 mit hep Mathematik 4.7 und 13.3."]]},
+ {id:"abs",spur:"B",nr:"4.2.04",name:"ABS / ASR / ESP",lek:"5 Lekt.",pr:"Prüfung an Termin 13",
+  lz:"erklären die Aufgaben und den Aufbau des ABS, ASR und ESP",src:"Dossier 4.2.04 · Repetitionsfragen",
+  g:[[1,"Raumachsen","Ich kann die Raumachsen des Fahrzeugs benennen.","Längs-, Quer- und Hochachse",
+      "Zeichne ein Auto von oben und trag die drei Achsen mit ihren Bewegungen ein."],
+     [2,"Aufgaben","Ich kann die Aufgaben von ABS, ASR und ESP erklären.","Schlupf, Kamm'scher Kreis",
+      "Erklär mit dem Kamm'schen Kreis, warum ein blockiertes Rad nicht mehr lenkt."],
+     [2,"Gesamtsystem","Ich kann den Aufbau des Gesamtsystems erklären.","Steuergerät, Hydroaggregat, Sensoren",
+      "Beschrifte das Systembild und schreib zu jedem Bauteil die Aufgabe."],
+     [2,"Sensoren","Ich kann aktive und passive Sensoren erklären.","Raddrehzahlsensoren, Signale",
+      "Vergleiche die beiden Sensorsignale im Dossier in einer Tabelle."],
+     [2,"Eigenlenkverhalten","Ich kann Über- und Untersteuern erklären.","Eigenlenkverhalten, Eingriff des ESP",
+      "Skizziere eine Kurve und zeichne Über- und Untersteuern ein."]]},
+ {id:"wid",spur:"B",nr:"4.5.11",name:"Veränderbare Widerstände",lek:"5 Lekt.",pr:"Prüfung an Termin 15 (mit 4.5.10)",
+  lz:"erklären die Aufgabe und die Eigenschaft von veränderbaren Widerständen",src:"Dossier 4.5.11",
+  g:[[2,"NTC","Ich kann Aufgabe und Eigenschaft des NTC erklären.","wärmer = kleinerer Widerstand",
+      "Lies drei Werte aus der NTC-Kennlinie ab und nenne ein Bauteil im Auto."],
+     [2,"PTC","Ich kann Aufgabe und Eigenschaft des PTC erklären.","wärmer = grösserer Widerstand",
+      "Beschreib die PTC-Schaltung im Dossier: Was passiert, wenn es heiss wird?"],
+     [2,"LDR","Ich kann Aufgabe und Eigenschaft des LDR erklären.","heller = kleinerer Widerstand",
+      "Nenne einen Einsatz des LDR im Fahrzeug und erklär, wie er schaltet."],
+     [2,"VDR","Ich kann Aufgabe und Eigenschaft des VDR erklären.","Überspannungsschutz",
+      "Erklär einem Kollegen, wovor der VDR eine Schaltung schützt."]]}
+];
+const ORDER={A:["mm","ms","kue","sch"],B:["zk","rie","gel","br","abs","wid"]};
+const NEXT={
+ mm:{weiter:"Saugrohr- gegen Direkteinspritzung. Dann Sensoren und Aktoren.",hook:"Bergab ohne Gas zeigt der Bordcomputer 0 Liter. Das ist die Schubabschaltung.",q:"Warum spritzt er wieder ein, bevor die Drehzahl zu tief fällt?"},
+ ms:{weiter:"Steuerdiagramme, Ventilspiel, variable Ventilsteuerung.",hook:"Reisst der Zahnriemen, treffen oft Kolben und Ventile aufeinander. Ein billiger Riemen kann den ganzen Motor kosten.",q:"Woran erkennst du einen «freilaufenden» Motor?"},
+ kue:{weiter:"Thermostat, Kühlerlüfter und sein Schaltplan.",hook:"Das Kühlmittel ist über 100 °C heiss. Trotzdem kocht es nicht. Der Überdruck hebt den Siedepunkt.",q:"Warum öffnest du den Kühlerdeckel nie bei heissem Motor?"},
+ sch:{weiter:"Ölpumpen, Ölfilter mit Umgehungsventil, Öldrucküberwachung.",hook:"Rennwagen haben Trockensumpf. So bleibt die Ölversorgung auch in schnellen Kurven sicher.",q:"Was passiert, wenn der Ölfilter ganz verstopft ist?"},
+ zk:{weiter:"Wärmewert und Kerzengesichter.",hook:"Die Zündspule erzeugt über 20 000 Volt. Bei jedem Arbeitstakt.",q:"Warum braucht ein Sportmotor eine «kältere» Kerze?"},
+ rie:{weiter:"Spannrollen: exzentrisch oder federbelastet.",hook:"Ein einziger Riemen treibt oft Lichtmaschine, Klimakompressor und Wasserpumpe an.",q:"Was bedeutet 6PK1070?"},
+ gel:{weiter:"Gleichlaufgelenke beim Frontantrieb.",hook:"Ein Kreuzgelenk dreht ungleichförmig. Pro Umdrehung zweimal schneller und wieder langsamer.",q:"Wie gleicht ein zweites Gelenk das aus?"},
+ br:{weiter:"Trommel- und Topfbremse. Dann Reibung rechnen.",hook:"Die Vorderachse leistet bis 70 % der Bremsarbeit. Darum sitzen vorne belüftete Scheiben.",q:"Warum bremst ein blockiertes Rad schlechter?"},
+ abs:{weiter:"ESP: Über- und Untersteuern.",hook:"ESP bremst gezielt ein einzelnes Rad. So dreht es das Auto zurück in die Spur.",q:"Welches Rad bremst ESP, wenn das Heck ausbricht?"},
+ wid:{weiter:"NTC und PTC messen. Kennlinien lesen.",hook:"Der Kühlmittelfühler ist ein NTC. Kalt: einige tausend Ohm. Warm: wenige hundert.",q:"Was zeigt die Anzeige bei Kabelbruch zum NTC?"}
+};
+const LP=[["Erklärungen","Die Erklärungen waren verständlich."],["Unterlagen","Dossier, beook und Aufträge waren klar."],["Praxisbezug","Ich sehe den Nutzen für die Werkstatt."],["Abwechslung","Die Methoden hielten mich aktiv."],["Lernklima","Fragen und Fehler waren okay."]];
+const HELP=["Nochmals erklären","Mehr Übungen","Am Fahrzeug zeigen","Lernvideo","Mit Kolleg/in üben","Repetition vor Prüfung"];
+const TEXTS=[["fbTop","Das war gut.","z. B. Das Schnittmodell hat geholfen."],["fbKritik","Das hat mich gestört.","z. B. Der Theorieblock war zu lang."],["fbWunsch","Das wünsche ich mir.","z. B. Mehr Übungen vor der Prüfung."]];
+
+const LEK={A:2,B:3};
+let pick={A:null,B:null}, sc={}, lp, tempo, help, txt, kz, anon, step=0;
+function resetAll(){sc={};T.forEach(t=>sc[t.id]=Array(t.g.length).fill(null));lp={A:Array(5).fill(null),B:Array(5).fill(null)};tempo={A:null,B:null};help=new Set();txt={fbTop:"",fbKritik:"",fbWunsch:""};kz="";anon=false}
+resetAll();
+try{const s=JSON.parse(localStorage.getItem('lsc-pick')||'{}');['A','B'].forEach(k=>{if(T.some(t=>t.id===s[k]))pick[k]=s[k]})}catch(e){}
+const $=id=>document.getElementById(id);
+const byId=id=>T.find(t=>t.id===id);
+const topics=()=>['A','B'].map(k=>pick[k]).filter(Boolean).map(byId);
+const fmt=v=>v==null?'–':(Number.isInteger(v)?v+'.0':String(v));
+const cls=v=>v==null?'':v>=5?'c-good':v>=4?'c-mid':'c-bad';
+const word=v=>v>=6?'sitzt sicher':v>=5?'gut':v>=4?'knapp genügend':v>=3?'noch unsicher':v>=2?'grosse Lücke':'keine Ahnung';
+const ticks='<div class="ticks"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></div>';
+const r1=v=>Math.round(v*10)/10;
+const kb=(k,extra)=>`<span class="k ${k>2?'extra':''}">K${k}<small>${KN[k]}</small></span>`;
+
+function sliderScreen(arr,i,head){const v=arr[i];
+  return `${head}<div class="card ${v==null?'untouched':''}" id="sw"><div class="big ${v==null?'unset':cls(v)}" id="bv">${fmt(v)}</div>
+    <div class="word" id="bw">${v==null?'Schieb den Regler auf deine Note':word(v)}</div>
+    <input type="range" id="rg" min="1" max="6" step="0.5" value="${v??4}" aria-label="Note von 1 bis 6">${ticks}</div>`}
+function bindSlider(arr,i){$('rg').addEventListener('input',e=>{const v=+e.target.value;arr[i]=v;$('sw').classList.remove('untouched');
+  const b=$('bv');b.textContent=fmt(v);b.className='big '+cls(v);$('bw').textContent=word(v);e.target.setAttribute('aria-valuetext','Note '+fmt(v));$('err').textContent=''})}
+function spider(t){const s0=sc[t.id],n=t.g.length,cx=240,cy=160,R=95;
+  const pt=(i,v)=>{const a=-Math.PI/2+i*2*Math.PI/n,r=R*(v-1)/5;return[cx+Math.cos(a)*r,cy+Math.sin(a)*r]};
+  let s=`<svg viewBox="0 0 480 320" width="100%" role="img" aria-label="Netzdiagramm ${t.name}">`;
+  for(let l=2;l<=6;l++)s+=`<polygon class="${l===4?'grid-4':'grid-l'}" points="${t.g.map((_,i)=>pt(i,l).join(',')).join(' ')}"/>`;
+  t.g.forEach((g,i)=>{const[x,y]=pt(i,6),[lx,ly]=pt(i,7.25),anc=Math.abs(lx-cx)<8?'middle':lx>cx?'start':'end';
+    s+=`<line class="grid-l" x1="${cx}" y1="${cy}" x2="${x}" y2="${y}"/><text x="${lx}" y="${ly}" text-anchor="${anc}" font-size="12.5" font-weight="700">${g[1]}</text><text x="${lx}" y="${ly+13}" text-anchor="${anc}" font-size="11" style="fill:var(--muted)">K${g[0]} · ${fmt(s0[i])}</text>`});
+  s+=`<polygon class="area" points="${s0.map((v,i)=>pt(i,v).join(',')).join(' ')}"/>`;
+  s0.forEach((v,i)=>{const[x,y]=pt(i,v);s+=`<circle class="pt" r="5" cx="${x}" cy="${y}"/>`});return s+'</svg>'}
+function focus(t){const s0=sc[t.id];const gap=s0.findIndex(v=>v<4);
+  if(gap>-1)return{i:gap,why:'Unter 4. Das holst du zuerst auf.'};
+  if(s0.every(v=>v>=5.5)){const i=s0.indexOf(Math.min(...s0));return{i,why:'Alles sitzt. Erklär es einer Kollegin. So bleibt es hängen.'}}
+  const i=s0.indexOf(Math.min(...s0));return{i,why:'Dein schwächstes Ziel. Hier holst du am meisten heraus.'}}
+const spuren=()=>['A','B'].filter(k=>pick[k]);
+function lernText(){const d=new Date().toLocaleDateString('de-CH');let t=`LERNSTAND-CHECK ${d} · Kürzel: ${kz}\n`;
+  topics().forEach(tp=>{t+=`\nSpur ${tp.spur} · ${tp.nr} ${tp.name} (${LEK[tp.spur]} Lekt.)\n`;tp.g.forEach((g,i)=>t+=`K${g[0]} ${g[1]}: ${fmt(sc[tp.id][i])}\n`)});
+  return t+`\nHilfe gewünscht: ${help.size?[...help].join(', '):'–'}`}
+function lpText(){const d=new Date().toLocaleDateString('de-CH');let t=`FEEDBACK AN DIE LEHRPERSON ${d} · ${anon?'anonym':'Kürzel: '+kz}\n`;
+  spuren().forEach(k=>{t+=`\nSpur ${k} · ${byId(pick[k]).name}\n`;LP.forEach((a,i)=>t+=`${a[0]}: ${fmt(lp[k][i])}\n`);t+=`Tempo: ${tempo[k]??'–'}\n`});
+  return t+`\nGut: ${txt.fbTop.trim()||'–'}\nKritik: ${txt.fbKritik.trim()||'–'}\nWunsch: ${txt.fbWunsch.trim()||'–'}`}
+function copyBtn(id,getText){$(id).onclick=()=>{const t=getText(),msg=$('copied'),ok=()=>msg.textContent='Kopiert. Jetzt einfügen und senden.';
+  try{navigator.clipboard.writeText(t).then(ok,()=>fb(t))}catch(e){fb(t)}}}
+function multiSlider(i){return spuren().map(k=>{const v=lp[k][i];return `<div class="card ${v==null?'untouched':''}" id="sw${k}">
+  <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px"><div class="spur-h">Spur ${k} · ${byId(pick[k]).name}</div>
+  <div class="val ${v==null?'unset':cls(v)}" id="bv${k}" style="font-family:var(--display);font-weight:700;font-size:2.4rem;line-height:1">${fmt(v)}</div></div>
+  <input type="range" id="rg${k}" min="1" max="6" step="0.5" value="${v??4}" aria-label="Note Spur ${k}">${ticks}</div>`}).join('')}
+function bindMulti(i){spuren().forEach(k=>$('rg'+k).addEventListener('input',e=>{const v=+e.target.value;lp[k][i]=v;$('sw'+k).classList.remove('untouched');
+  const b=$('bv'+k);b.textContent=fmt(v);b.className='val '+cls(v);e.target.setAttribute('aria-valuetext','Note '+fmt(v));$('err').textContent=''}))}
+
+let ITEMS={};
+function rows(list){return list.map(it=>{ITEMS[it.key]=it;const v=it.arr[it.i];return `<div class="rs ${v==null?'untouched':''}" id="w_${it.key}">
+  <div class="rh">${it.k?kb(it.k):''}<span class="rl">${it.label}</span><b class="rv ${v==null?'unset':cls(v)}" id="v_${it.key}">${fmt(v)}</b></div>
+  <input type="range" min="1" max="6" step="0.5" value="${v??4}" data-key="${it.key}" aria-label="${it.label}"></div>`}).join('')}
+function bindRows(){document.querySelectorAll('input[data-key]').forEach(r=>r.addEventListener('input',()=>{const it=ITEMS[r.dataset.key],v=+r.value;it.arr[it.i]=v;
+  $('w_'+it.key).classList.remove('untouched');const b=$('v_'+it.key);b.textContent=fmt(v);b.className='rv '+cls(v);r.setAttribute('aria-valuetext','Note '+fmt(v));$('err').textContent=''}))}
+const scale='<div class="scale"><span>1 = keine Ahnung</span><span>4 = genügend</span><span>6 = sitzt</span></div>';
+function bindPick(){document.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{const k=b.dataset.s;pick[k]=b.dataset.t||null;
+  try{localStorage.setItem('lsc-pick',JSON.stringify(pick))}catch(e){}
+  document.querySelectorAll(`[data-s="${k}"]`).forEach(x=>x.setAttribute('aria-pressed',x===b));$('err').textContent='';updateBar()})}
+
+function slides(){const S=[],TP=topics();
+  /* 1 Kürzel */
+  S.push({sec:'Start',html:()=>`<div class="eyebrow">BBW Winterthur · AFP · 5. Semester</div>
+    <h1>Lernstand-Check</h1><p class="lead">Exit-Ticket. 5 Minuten. Keine Note.</p>
+    <div class="card"><h3>Dein Namenskürzel</h3><p class="hint">2 bis 4 Buchstaben, z. B. «MK».</p>
+    <input type="text" id="kz" maxlength="4" autocomplete="off" autocapitalize="characters" aria-label="Namenskürzel"
+      style="font-family:var(--display);font-weight:700;font-size:2.6rem;text-align:center;letter-spacing:.15em;text-transform:uppercase;padding:10px;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--ink);width:100%"></div>
+    <label class="card" for="anon" style="flex-direction:row;align-items:flex-start;gap:12px;cursor:pointer">
+      <input type="checkbox" id="anon" style="width:24px;height:24px;accent-color:var(--accent);flex:0 0 auto;margin-top:2px">
+      <span><b>Feedback an die LP anonym</b><br><span class="hint">Dein Kürzel steht dann nur beim Lernstand.</span></span></label>`,
+    bind:()=>{const i=$('kz'),c=$('anon');i.value=kz;c.checked=anon;i.oninput=()=>{kz=i.value.toUpperCase().replace(/[^A-ZÄÖÜ]/g,'');i.value=kz;$('err').textContent=''};c.onchange=()=>anon=c.checked},
+    ok:()=>kz.length>=2?'':'Gib dein Kürzel ein (mind. 2 Buchstaben).'});
+  /* 2 Themen */
+  S.push({sec:'Themen',html:()=>`<span class="tag">Themen von heute</span><h2>Was hattet ihr heute?</h2><p class="hint">Wähl pro Spur ein Thema.</p>
+    ${['A','B'].map(k=>`<div class="card"><div class="spur-h">Spur ${k} · ${k==='A'?'Motor':'Bremse / Antrieb / Elektro'} · ${LEK[k]} Lekt.</div><div class="chips">${
+      T.filter(t=>t.spur===k).map(t=>`<button type="button" class="chip" data-s="${k}" data-t="${t.id}" aria-pressed="${pick[k]===t.id}">${t.name} <small>${t.nr}</small></button>`).join('')}
+      <button type="button" class="chip" data-s="${k}" data-t="" aria-pressed="${!pick[k]}">heute nicht</button></div></div>`).join('')}`,
+    bind:bindPick,ok:()=>topics().length?'':'Wähl mindestens ein Thema.'});
+  /* 3-4 Lernstand pro Spur (Feed Up + Feed Back) */
+  TP.forEach(t=>S.push({sec:`Lernstand · Spur ${t.spur}`,html:()=>`<span class="tag">Spur ${t.spur} · Wo stehst du?</span><h2>${t.name}</h2>
+    <div class="lz"><b>LZ ${t.nr}</b><p>Automobil-Fachleute ${t.lz}.</p></div>
+    <div class="meta"><span class="pill">${t.pr}</span></div>
+    <div class="card">${scale}${rows(t.g.map((g,i)=>({key:t.id+'_'+i,arr:sc[t.id],i,label:g[2],k:g[0]})))}</div>`,
+    bind:bindRows,ok:()=>sc[t.id].some(v=>v==null)?'Stell jeden Regler ein.':''}));
+  /* 5 Feed Back */
+  S.push({sec:'Feed Back',html:()=>`<span class="tag">Feed Back</span><h2>Dein Lernstand heute</h2>${TP.map(t=>{
+      const s0=sc[t.id],avg=r1(s0.reduce((a,b)=>a+b,0)/s0.length),gaps=s0.filter(v=>v<4).length;
+      return `<div class="card"><div class="spur-h">Spur ${t.spur} · ${t.name}</div>${spider(t)}
+      <div class="stats" style="grid-template-columns:repeat(2,1fr)"><div class="stat"><b class="${cls(avg)}">${avg}</b><span>Durchschnitt</span></div><div class="stat"><b>${gaps}</b><span>Ziele unter 4</span></div></div></div>`}).join('')}
+    <p class="hint">Gestrichelt = Note 4.</p>`});
+  /* 6 Feed Forward */
+  S.push({sec:'Feed Forward',html:()=>`<span class="tag">Feed Forward</span><h2>Dein nächster Schritt</h2>${TP.map(t=>{const f=focus(t),g=t.g[f.i];
+      return `<div class="ff"><div class="spur-h">Spur ${t.spur} · ${t.name}</div><h3>Fokus: ${g[1]} · jetzt ${fmt(sc[t.id][f.i])}</h3><p class="hint">${f.why}</p><p>${g[4]}</p><p class="src">Quelle: ${t.src}</p></div>`}).join('')}`});
+  /* 7 Hilfe */
+  S.push({sec:'Hilfe',html:()=>`<span class="tag">Feed Forward</span><h2>Was hilft dir?</h2><p class="hint">Mehrere möglich. Freiwillig.</p>
+    <div class="chips">${HELP.map((h,i)=>`<button type="button" class="chip" data-h="${i}" aria-pressed="${help.has(h)}">${h}</button>`).join('')}</div>`,
+    bind:()=>document.querySelectorAll('[data-h]').forEach(b=>b.onclick=()=>{const h=HELP[+b.dataset.h];help.has(h)?help.delete(h):help.add(h);b.setAttribute('aria-pressed',help.has(h))})});
+  /* 8 Vorschau */
+  S.push({sec:'Vorschau',html:()=>`<span class="tag">Vorschau</span><h2>Nächstes Mal</h2>${TP.map(t=>{const n=NEXT[t.id],o=ORDER[t.spur],nx=byId(o[o.indexOf(t.id)+1]);
+      return `<div class="card" style="border-color:var(--accent)"><div class="spur-h">Spur ${t.spur} · ${t.name}</div>
+      <div class="eyebrow" style="color:var(--accent-ink)">Wusstest du?</div><p style="font-weight:500">${n.hook}</p>
+      <p><b>Weiter mit:</b> ${n.weiter}</p><p><b>Denkfrage:</b> ${n.q}</p>
+      ${nx?`<div class="meta"><span class="pill">Danach: ${nx.nr} ${nx.name}</span></div>`:''}</div>`}).join('')}
+    <p class="hint">Bring deine Antwort mit. Wir lösen sie zusammen.</p>`});
+  /* 9-10 Feedback LP pro Spur */
+  spuren().forEach(k=>S.push({sec:`Feedback LP · Spur ${k}`,html:()=>`<span class="tag">Feedback an die LP · Spur ${k}</span><h2>${byId(pick[k]).name}</h2>
+    <p class="hint">Wie war der Unterricht? 1 bis 6.</p>
+    <div class="card">${scale}${rows(LP.map((a,i)=>({key:'lp'+k+'_'+i,arr:lp[k],i,label:a[1]})))}</div>
+    <div class="card"><div class="spur-h">Tempo</div><div class="seg" style="flex-direction:row">${['zu langsam','genau richtig','zu schnell'].map(x=>`<button type="button" style="flex:1;font-size:.95rem;padding:12px 4px" data-sp="${k}" data-tp="${x}" aria-pressed="${tempo[k]===x}">${x}</button>`).join('')}</div></div>`,
+    bind:()=>{bindRows();document.querySelectorAll('[data-tp]').forEach(b=>b.onclick=()=>{tempo[k]=b.dataset.tp;document.querySelectorAll(`[data-sp="${k}"]`).forEach(x=>x.setAttribute('aria-pressed',x===b));$('err').textContent=''})},
+    ok:()=>lp[k].some(v=>v==null)||!tempo[k]?'Stell alle Regler ein und wähl das Tempo.':''}));
+  /* 11 Top / Kritik / Wunsch */
+  S.push({sec:'Feedback LP · Text',html:()=>`<span class="tag">Feedback an die LP</span><h2>Top, Kritik, Wunsch</h2><p class="hint">Freiwillig. Kurz und ehrlich.</p>
+    <div class="tx" style="display:flex;flex-direction:column;gap:6px">${TEXTS.map(([id,h,ph])=>`<label class="tl" for="${id}">${h}</label><textarea id="${id}" placeholder="${ph}"></textarea>`).join('')}</div>`,
+    bind:()=>TEXTS.forEach(([id])=>{const ta=$(id);ta.value=txt[id];ta.oninput=()=>txt[id]=ta.value})});
+  /* 12 Exit-Ticket */
+  S.push({sec:'Exit-Ticket',html:()=>{const rows=[["Datum",new Date().toLocaleDateString('de-CH')],["Kürzel",kz]];
+      TP.forEach(t=>{rows.push([`<b>Spur ${t.spur}</b>`,`<b>${t.nr} ${t.name}</b>`]);t.g.forEach((g,i)=>rows.push([`K${g[0]} ${g[1]}`,fmt(sc[t.id][i])]))});
+      rows.push(["Hilfe",help.size?[...help].join(', '):'–'],["Feedback an LP",anon?'anonym':'mit Kürzel']);
+    return `<span class="tag">Fertig</span><h2>Dein Exit-Ticket</h2><div class="ticket">${rows.map(r=>`<div class="row"><span>${r[0]}</span><span>${r[1]}</span></div>`).join('')}</div>
+    ${anon?`<button class="btn primary" type="button" id="copy1">1 · Lernstand kopieren</button>
+      <button class="btn primary" type="button" id="copy2">2 · Feedback kopieren (anonym)</button>`
+      :`<button class="btn primary" type="button" id="copy">Alles kopieren</button>`}
+    <span id="copied" aria-live="polite"></span>
+    <p class="hint">${anon?'Zwei Texte. Getrennt senden. Feedback ins anonyme Formular.':'Text einfügen, wo die Lehrperson es sagt.'} Screenshot fürs Lernjournal.</p>
+    <details class="card"><summary>Für die Lehrperson: Einordnung</summary><div class="tw"><table class="info">
+      <tr><td>Hattie</td><td>Feed Up = Leistungsziel · Feed Back = Regler und Netz · Feed Forward = nächster Schritt mit Quelle · Vorschau</td></tr>
+      <tr><td>Taxonomie</td><td>K-Stufe nach Verb im BBW-Lehrplan: nennen K1, erklären/beschreiben K2, rechnen/austauschen K3</td></tr>
+      <tr><td>Umfang</td><td>max. 12 Seiten, ca. 5 Min.</td></tr>
+      <tr><td>Sozialform</td><td>Einzelarbeit am Smartphone (BYOD)</td></tr>
+      <tr><td>Transparenz</td><td>Lernende entscheiden über die Weitergabe</td></tr></table></div></details>`},
+    bind:()=>{if(anon){copyBtn('copy1',lernText);copyBtn('copy2',lpText)}else copyBtn('copy',()=>lernText()+'\n\n'+lpText())}});
+  return S}
+function fb(t){const a=document.createElement('textarea');a.value=t;$('copied').textContent='Text unten markieren und kopieren:';$('copied').after(a);a.select()}
+function updateBar(){const S=slides(),pct=Math.round(step/(S.length-1)*100);$('fill').style.width=pct+'%';$('track').setAttribute('aria-valuenow',pct);
+  $('sec').textContent=S[step].sec;$('count').textContent=`${step+1} / ${topics().length?S.length:12}`;
+  $('back').disabled=step===0;$('next').textContent=step===S.length-1?'Neu beginnen':step===0?'Los geht’s':'Weiter'}
+function go(n){const S=slides();step=Math.max(0,Math.min(n,S.length-1));const s=S[step];
+  $('slide').innerHTML=s.html();s.bind&&s.bind();$('err').textContent='';updateBar();window.scrollTo({top:0})}
+$('next').onclick=()=>{const S=slides(),s=S[step];
+  if(step===S.length-1){resetAll();go(0);return}
+  const e=s.ok?s.ok():'';if(e){$('err').textContent=e;return}go(step+1)};
+$('back').onclick=()=>go(step-1);
+go(0);
+</script>
+
+</body>
+</html>
