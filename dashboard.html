@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Lernstand-Check · Dashboard</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap">
+<style>
+:root{--bg:#f1f4f1;--card:#fff;--ink:#1b211d;--muted:#5a645d;--line:#d3dcd5;--grid:#e6ece7;
+  --accent:#1f7a4d;--accent-soft:#dcefe3;--accent-ink:#145236;--bad:#b42323;--bad-soft:#fbe4e4;
+  --display:'Barlow Condensed','Arial Narrow',sans-serif;--body:'Barlow',system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root{--bg:#141916;--card:#1d241f;--ink:#e8eee9;--muted:#9faba2;--line:#33403a;--grid:#26302a;
+  --accent:#3fae73;--accent-soft:#16352a;--accent-ink:#9fe6bf;--bad:#ff8a8a;--bad-soft:#3a1d1d;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 var(--body)}
+.wrap{max-width:1180px;margin:0 auto;padding:20px 16px 60px;display:flex;flex-direction:column;gap:16px}
+h1,h2,h3{font-family:var(--display);font-weight:700;margin:0;letter-spacing:.01em}
+h1{font-size:2.2rem;line-height:1}
+h2{font-size:1.35rem}
+h3{font-size:1.05rem}
+p{margin:0}
+.eyebrow{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.muted{color:var(--muted)}
+.small{font-size:.86rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:end}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:.8rem;color:var(--muted);font-weight:600}
+input,select{font:inherit;font-size:.95rem;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);min-width:150px}
+input.wide{min-width:min(420px,100%)}
+.btn{font:inherit;font-weight:600;padding:9px 16px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn:focus-visible,input:focus-visible,select:focus-visible,.bar:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+#status{font-size:.9rem;min-height:1.3em}
+#status.err{color:var(--bad)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.tile b{display:block;font-family:var(--display);font-size:2.3rem;line-height:1;font-variant-numeric:tabular-nums}
+.tile span{font-size:.82rem;color:var(--muted)}
+.tile b.low{color:var(--bad)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(520px,100%),1fr));gap:16px}
+.sum{border-left:4px solid var(--accent)}
+.sum ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.sum li b{font-weight:600}
+/* Balken */
+.bars{display:flex;flex-direction:column;gap:2px}
+.br{display:grid;grid-template-columns:minmax(100px,190px) 1fr 76px;gap:10px;align-items:center;min-height:30px}
+.br .lab{font-size:.88rem;line-height:1.2}
+.br .lab small{display:block;color:var(--muted);font-size:.75rem}
+.br .val{white-space:nowrap;font-family:var(--display);font-weight:700;font-size:1.15rem;text-align:right;font-variant-numeric:tabular-nums}
+.track{position:relative;height:18px}
+.track .four{position:absolute;top:-4px;bottom:-4px;border-left:2px dashed var(--muted);opacity:.7}
+.bar{position:absolute;left:0;top:3px;height:12px;border-radius:0 4px 4px 0;background:var(--accent);cursor:default}
+.bar.low{background:var(--bad)}
+.bar:hover{filter:brightness(1.15)}
+.axis{display:grid;grid-template-columns:minmax(100px,190px) 1fr 76px;gap:10px;font-size:.72rem;color:var(--muted);font-family:var(--display)}
+.axis div{display:flex;justify-content:space-between}
+.key{display:flex;gap:14px;flex-wrap:wrap;font-size:.8rem;color:var(--muted)}
+.key i{display:inline-block;width:12px;height:12px;border-radius:2px;vertical-align:-1px;margin-right:5px}
+.key i.d{width:0;height:12px;border-left:2px dashed var(--muted);border-radius:0}
+.tag{display:inline-block;font-size:.72rem;font-weight:600;padding:1px 6px;border-radius:4px;background:var(--bad-soft);color:var(--bad)}
+/* Tabelle */
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+th{text-align:left;font-weight:600;color:var(--muted);font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--line);padding:6px}
+td{border-bottom:1px solid var(--grid);padding:6px;vertical-align:top}
+td.n{text-align:right;font-variant-numeric:tabular-nums}
+td.low{color:var(--bad);font-weight:600}
+/* Texte */
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.cols ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;max-height:360px;overflow:auto}
+.cols li{border-left:3px solid var(--line);padding:2px 0 2px 10px;font-size:.92rem}
+.cols li small{display:block;color:var(--muted);font-size:.75rem}
+#tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--card);padding:8px 10px;border-radius:8px;font-size:.82rem;line-height:1.35;z-index:10;max-width:260px;display:none}
+#tip b{font-family:var(--display);font-size:1.2rem}
+.empty{color:var(--muted);font-style:italic}
+details summary{cursor:pointer;font-weight:600}
+@media print{.noprint{display:none!important}body{background:#fff}.card,.tile{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="row" style="justify-content:space-between;align-items:center">
+    <div><div class="eyebrow">BBW Winterthur · AFP · 5. Semester</div><h1>Lernstand-Check · Dashboard</h1></div>
+    <button class="btn noprint" type="button" onclick="window.print()">Drucken / PDF</button>
+  </header>
+
+  <details class="card noprint" id="setup">
+    <summary>Verbindung</summary>
+    <div class="row">
+      <label class="f">Web-App-URL (Google Apps Script)<input class="wide" id="url" placeholder="https://script.google.com/macros/s/…/exec"></label>
+      <label class="f">Schlüssel<input id="key" type="password" autocomplete="off"></label>
+      <button class="btn primary" type="button" id="load">Daten laden</button>
+      <button class="btn" type="button" id="demo">Demo-Daten</button>
+    </div>
+    <p class="small muted">URL und Schlüssel bleiben nur in diesem Browser gespeichert.</p>
+  </details>
+  <div id="status" aria-live="polite"></div>
+
+  <section class="card noprint" aria-label="Filter">
+    <div class="row">
+      <label class="f">Datum<select id="fDate"></select></label>
+      <label class="f">Klasse<select id="fKlasse"></select></label>
+      <label class="f">Thema<select id="fThema"></select></label>
+      <button class="btn" type="button" id="reload">Aktualisieren</button>
+    </div>
+  </section>
+
+  <main id="out" style="display:flex;flex-direction:column;gap:16px"><p class="empty">Noch keine Daten. Öffne «Verbindung» und lade die Daten.</p></main>
+</div>
+<div id="tip" role="tooltip"></div>
+
+<script>
+/* Hier die Web-App-URL fix eintragen, dann muss niemand sie eingeben. */
+const DEFAULT_URL='';
+const LP=['Erklärungen','Unterlagen','Praxisbezug','Abwechslung','Lernklima'];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const num=v=>{const x=parseFloat(String(v).replace(',','.'));return isFinite(x)?x:null};
+const mean=a=>a.length?Math.round(a.reduce((s,x)=>s+x,0)/a.length*10)/10:null;
+const f1=v=>v==null?'–':v.toFixed(1);
+const pct=v=>v==null?'–':Math.round(v*100)+' %';
+const dCH=iso=>{const m=/^(\d{4})-(\d{2})-(\d{2})/.exec(iso||'');return m?`${m[3]}.${m[2]}.${m[1]}`:esc(iso)};
+const ls=(k,v)=>{try{if(v===undefined)return localStorage.getItem(k)||'';localStorage.setItem(k,v)}catch(e){return ''}};
+
+let RAW={Lernstand:[],Feedback:[],Texte:[]};
+
+/* ---------- Laden ---------- */
+function status(t,err){const s=$('status');s.textContent=t;s.className=err?'err':''}
+async function load(){
+  const url=$('url').value.trim(),key=$('key').value;
+  if(!/^https:\/\/script\.google(usercontent)?\.com\//.test(url)){status('Bitte die Web-App-URL von Google Apps Script eintragen.',true);$('setup').open=true;return}
+  if(!key){status('Bitte den Schlüssel eintragen.',true);$('setup').open=true;return}
+  ls('lsd-url',url);ls('lsd-key',key);status('Lade Daten …');
+  try{const r=await fetch(url+'?key='+encodeURIComponent(key));const j=await r.json();
+    if(!j.ok){status(j.fehler||'Keine Daten erhalten.',true);return}
+    RAW={Lernstand:j.Lernstand||[],Feedback:j.Feedback||[],Texte:j.Texte||[]};
+    status(`Geladen: ${new Set(RAW.Lernstand.map(r=>r.ID)).size} Lernstand-Tickets · ${new Date().toLocaleTimeString('de-CH',{hour:'2-digit',minute:'2-digit'})}`);
+    $('setup').open=false;fillFilters();render()}
+  catch(e){status('Laden ging nicht. URL, Schlüssel und Bereitstellung («Zugriff: Jeder») prüfen.',true)}}
+
+/* ---------- Demo ---------- */
+function demo(){
+  const T={mm:{spur:'A',lz:'4.5.10',name:'Motormanagement Otto',g:[['K1','Energieträger',4.8],['K2','Kraftstoffanlage',4.4],['K2','Gemisch & Lambda',3.6],['K2','Einspritzung',4.0],['K3','Arbeit & Energie',3.3]]},
+           br:{spur:'B',lz:'2.2.06',name:'Scheiben-/Trommelbremsen',g:[['K2','Scheibenbremse',4.9],['K2','Trommelbremse',4.2],['K2','Nachstellung',3.7],['K2','Reibung',4.3],['K3','Rechnen',3.4]]}};
+  const H=['Nochmals erklären','Mehr Übungen','Am Fahrzeug zeigen','Lernvideo','Mit Kolleg/in üben','Repetition vor Prüfung'];
+  const top=['Das Schnittmodell war super.','Die Übungen am Fahrzeug.','Klare Struktur.','Gute Beispiele aus der Werkstatt.'];
+  const kri=['Theorieblock zu lang.','Rechnen ging zu schnell.','Zu wenig Pause.','Dossier unübersichtlich.'];
+  const wun=['Mehr Übungen vor der Prüfung.','Lernvideo zu Lambda.','Mehr am Fahrzeug.','Lösungen früher.'];
+  let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+  const note=m=>Math.max(1,Math.min(6,Math.round((m+(rnd()+rnd()+rnd()-1.5)*1.6)*2)/2));
+  const L=[],F=[],X=[];
+  [['2026-11-05','AFP 23A'],['2026-11-12','AFP 23A'],['2026-11-19','AFP 23A'],['2026-11-19','AFP 23B']].forEach(([d,k],di)=>{
+    for(let s=0;s<16;s++){const id='d'+di+'_'+s,kz=String.fromCharCode(65+s)+String.fromCharCode(75+(s*3)%12),lift=di*0.15;
+      const hilfe=H.filter(()=>rnd()<.22).join(', ');
+      Object.values(T).forEach(t=>t.g.forEach(g=>L.push({ID:id,Zeit:d+'T11:5'+(s%10),Datum:d,Klasse:k,'Kürzel':kz,Spur:t.spur,LZ:t.lz,Thema:t.name,K:g[0],Ziel:g[1],Note:note(g[2]+lift),Hilfe:hilfe})));
+      const anon=rnd()<.4,fid='f'+id;
+      Object.values(T).forEach(t=>F.push({ID:fid,Datum:d,Klasse:k,'Kürzel':anon?'anonym':kz,Spur:t.spur,Thema:t.name,
+        'Erklärungen':note(4.9),Unterlagen:note(t.spur==='A'?3.9:4.6),Praxisbezug:note(5.1),Abwechslung:note(4.2),Lernklima:note(5.3),
+        Tempo:rnd()<.62?'genau richtig':rnd()<.7?'zu schnell':'zu langsam'}));
+      if(rnd()<.5)X.push({ID:fid,Datum:d,Klasse:k,'Kürzel':anon?'anonym':kz,Top:rnd()<.7?top[s%4]:'',Kritik:rnd()<.6?kri[(s+di)%4]:'',Wunsch:rnd()<.6?wun[(s+1)%4]:''});}});
+  RAW={Lernstand:L,Feedback:F,Texte:X};status('Demo-Daten (erfunden) geladen.');$('setup').open=false;fillFilters();render()}
+
+/* ---------- Filter ---------- */
+function opts(sel,vals,allLabel,fmt){const cur=sel.value;sel.innerHTML=`<option value="">${allLabel}</option>`+vals.map(v=>`<option value="${esc(v)}">${esc(fmt?fmt(v):v)}</option>`).join('');if(vals.includes(cur))sel.value=cur}
+function fillFilters(){const all=[...RAW.Lernstand,...RAW.Feedback];
+  opts($('fDate'),[...new Set(all.map(r=>r.Datum))].filter(Boolean).sort().reverse(),'Alle Daten (gesamt)',dCH);
+  opts($('fKlasse'),[...new Set(all.map(r=>r.Klasse))].filter(Boolean).sort(),'Alle Klassen');
+  opts($('fThema'),[...new Set(all.map(r=>r.Thema))].filter(Boolean).sort(),'Alle Themen')}
+function pass(r,useThema=true){const d=$('fDate').value,k=$('fKlasse').value,t=$('fThema').value;
+  return (!d||r.Datum===d)&&(!k||r.Klasse===k)&&(!useThema||!t||r.Thema===t)}
+function dedup(rows,keyFn){const seen=new Set();return rows.filter(r=>{const k=keyFn(r);if(seen.has(k))return false;seen.add(k);return true})}
+
+/* ---------- Auswertung ---------- */
+function analyse(){
+  const L=dedup(RAW.Lernstand.filter(r=>pass(r)),r=>r.ID+'|'+r.Thema+'|'+r.Ziel).map(r=>({...r,v:num(r.Note)})).filter(r=>r.v!=null);
+  const F=dedup(RAW.Feedback.filter(r=>pass(r)),r=>r.ID+'|'+r.Spur);
+  const X=dedup(RAW.Texte.filter(r=>pass(r,false)),r=>r.ID);
+  const tickets=[...new Set(L.map(r=>r.ID))];
+  const themen=[...new Set(L.map(r=>r.Thema))].sort((a,b)=>(L.find(r=>r.Thema===a).Spur||'').localeCompare(L.find(r=>r.Thema===b).Spur||''));
+  const perThema=themen.map(t=>{const rows=L.filter(r=>r.Thema===t),goals=[];
+    rows.forEach(r=>{let g=goals.find(x=>x.ziel===r.Ziel);if(!g)goals.push(g={ziel:r.Ziel,k:r.K,vals:[]});g.vals.push(r.v)});
+    goals.forEach(g=>{g.avg=mean(g.vals);g.under=g.vals.filter(v=>v<4).length/g.vals.length;g.n=g.vals.length;g.min=Math.min(...g.vals);g.max=Math.max(...g.vals)});
+    return {thema:t,spur:rows[0].Spur,lz:rows[0].LZ,n:new Set(rows.map(r=>r.ID)).size,avg:mean(rows.map(r=>r.v)),goals}});
+  const helpCount={};dedup(RAW.Lernstand.filter(r=>pass(r)),r=>r.ID).forEach(r=>String(r.Hilfe||'').split(',').map(s=>s.trim()).filter(Boolean).forEach(h=>helpCount[h]=(helpCount[h]||0)+1));
+  const lp=LP.map(c=>{const v=F.map(r=>num(r[c])).filter(x=>x!=null);return{c,avg:mean(v),n:v.length,under:v.length?v.filter(x=>x<4).length/v.length:null}});
+  const tempo={'zu langsam':0,'genau richtig':0,'zu schnell':0};F.forEach(r=>{if(r.Tempo in tempo)tempo[r.Tempo]++});
+  const tN=Object.values(tempo).reduce((a,b)=>a+b,0);
+  const students=[];tickets.forEach(id=>{const rows=L.filter(r=>r.ID===id);const byT=[...new Set(rows.map(r=>r.Thema))];
+    byT.forEach(t=>{const rr=rows.filter(r=>r.Thema===t),lo=rr.reduce((a,b)=>b.v<a.v?b:a);
+      students.push({kz:rr[0]['Kürzel'],klasse:rr[0].Klasse,datum:rr[0].Datum,thema:t,avg:mean(rr.map(r=>r.v)),under:rr.filter(r=>r.v<4).length,low:lo.Ziel,lowv:lo.v})})});
+  students.sort((a,b)=>a.avg-b.avg);
+  return {L,F,X,tickets,perThema,helpCount,lp,tempo,tN,students,all:L.map(r=>r.v)}}
+
+function summary(A){const out=[];
+  if(!A.tickets.length)return out;
+  A.perThema.forEach(t=>{const s=[...t.goals].sort((a,b)=>a.avg-b.avg),weak=s[0],strong=s[s.length-1],gaps=s.filter(g=>g.avg<4);
+    out.push(`<b>${esc(t.thema)}</b> (${t.n} Rückmeldungen): Ø ${f1(t.avg)}. Stärkstes Ziel: ${esc(strong.ziel)} (${f1(strong.avg)}). `+
+      (gaps.length?`Unter 4: ${gaps.map(g=>`${esc(g.ziel)} (${f1(g.avg)}, ${pct(g.under)} unter 4)`).join(', ')}.`:`Schwächstes Ziel: ${esc(weak.ziel)} (${f1(weak.avg)}, ${pct(weak.under)} unter 4).`))});
+  const lpv=A.lp.filter(x=>x.avg!=null);
+  if(lpv.length){const lo=[...lpv].sort((a,b)=>a.avg-b.avg)[0],hi=[...lpv].sort((a,b)=>b.avg-a.avg)[0];
+    out.push(`<b>Unterricht:</b> Am besten bewertet: ${esc(hi.c)} (${f1(hi.avg)}). Am tiefsten: ${esc(lo.c)} (${f1(lo.avg)}).`)}
+  if(A.tN){const p=k=>A.tempo[k]/A.tN;out.push(`<b>Tempo:</b> ${pct(p('genau richtig'))} genau richtig, ${pct(p('zu schnell'))} zu schnell, ${pct(p('zu langsam'))} zu langsam.`+
+    (p('zu schnell')>=.3?' Mehr Übungszeit einplanen.':p('zu langsam')>=.3?' Mehr Tempo und Zusatzaufgaben für Schnelle.':''))}
+  const h=Object.entries(A.helpCount).sort((a,b)=>b[1]-a[1]).slice(0,2);
+  if(h.length)out.push(`<b>Gewünschte Hilfe:</b> ${h.map(([k,v])=>`${esc(k)} (${v}×)`).join(', ')}.`);
+  const todo=[];A.perThema.forEach(t=>t.goals.filter(g=>g.avg<4||g.under>=.3).sort((a,b)=>a.avg-b.avg).slice(0,2).forEach(g=>todo.push(`${esc(g.ziel)} (${esc(t.thema)})`)));
+  if(todo.length)out.push(`<b>Nächste Lektion:</b> Repetieren: ${todo.join(', ')}.`);
+  return out}
+
+/* ---------- Darstellung ---------- */
+function bars(items){/* items: {label,sub,v,tip} Skala 1–6 */
+  const x=v=>((v-1)/5*100).toFixed(1)+'%';
+  return `<div class="bars">${items.map(it=>`<div class="br"><div class="lab">${esc(it.label)}${it.sub?`<small>${esc(it.sub)}</small>`:''}</div>
+    <div class="track"><span class="four" style="left:${x(4)}"></span>${it.v==null?'':`<span class="bar ${it.v<4?'low':''}" style="width:${x(it.v)}" tabindex="0" data-tip="${esc(it.tip)}"></span>`}</div>
+    <div class="val">${f1(it.v)}${it.v!=null&&it.v<4?' <span class="tag">&lt;4</span>':''}</div></div>`).join('')}
+    <div class="axis"><span></span><div><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></div><span></span></div></div>`}
+const keyHtml='<div class="key"><span><i style="background:var(--accent)"></i>Ø ab 4</span><span><i style="background:var(--bad)"></i>Ø unter 4</span><span><i class="d"></i>Note 4</span></div>';
+
+function render(){const A=analyse(),o=$('out');
+  if(!A.tickets.length&&!A.F.length){o.innerHTML='<p class="empty">Für diese Auswahl gibt es keine Daten.</p>';return}
+  const under=A.all.length?A.all.filter(v=>v<4).length/A.all.length:null,avgAll=mean(A.all),lpAll=mean(A.lp.filter(x=>x.avg!=null).map(x=>x.avg));
+  const sel=[$('fDate').value?dCH($('fDate').value):'Alle Daten',$('fKlasse').value||'Alle Klassen',$('fThema').value||'Alle Themen'].map(esc).join(' · ');
+  const sum=summary(A);
+  o.innerHTML=`
+  <section class="tiles" aria-label="Kennzahlen">
+    <div class="tile"><b>${A.tickets.length}</b><span>Rückmeldungen</span></div>
+    <div class="tile"><b class="${avgAll!=null&&avgAll<4?'low':''}">${f1(avgAll)}</b><span>Ø Selbsteinschätzung</span></div>
+    <div class="tile"><b class="${under!=null&&under>=.3?'low':''}">${pct(under)}</b><span>Einschätzungen unter 4</span></div>
+    <div class="tile"><b class="${lpAll!=null&&lpAll<4?'low':''}">${f1(lpAll)}</b><span>Ø Feedback Unterricht</span></div>
+    <div class="tile"><b>${A.tN?pct(A.tempo['genau richtig']/A.tN):'–'}</b><span>Tempo «genau richtig»</span></div>
+  </section>
+  <section class="card sum"><div class="row" style="justify-content:space-between;align-items:center"><div><div class="eyebrow">Gesamtauswertung · ${sel}</div><h2>Zusammenfassung</h2></div>
+    <button class="btn noprint" type="button" id="cpy">Kopieren</button></div>
+    ${sum.length?`<ul>${sum.map(s=>`<li>${s}</li>`).join('')}</ul>`:'<p class="empty">Zu wenig Daten.</p>'}<span id="cpyMsg" class="small muted" aria-live="polite"></span></section>
+  <section class="grid2">${A.perThema.map(t=>`<div class="card"><div><div class="eyebrow">Spur ${esc(t.spur)} · LZ ${esc(t.lz)} · ${t.n} Rückmeldungen</div><h2>${esc(t.thema)}</h2></div>
+    <p class="small muted">Ø Selbsteinschätzung pro Lernziel</p>${keyHtml}
+    ${bars(t.goals.map(g=>({label:g.ziel,sub:g.k,v:g.avg,tip:`${g.ziel}\nØ ${f1(g.avg)} · n = ${g.n}\n${pct(g.under)} unter 4 · Spanne ${f1(g.min)}–${f1(g.max)}`})))}</div>`).join('')}</section>
+  <section class="grid2">
+    <div class="card"><div><div class="eyebrow">Feedback an die Lehrperson</div><h2>Unterricht</h2></div>
+      <p class="small muted">Ø Bewertung pro Kriterium${$('fThema').value?'':' · alle Themen'}</p>${keyHtml}
+      ${A.lp.some(x=>x.avg!=null)?bars(A.lp.map(x=>({label:x.c,v:x.avg,tip:`${x.c}\nØ ${f1(x.avg)} · n = ${x.n}\n${pct(x.under)} unter 4`}))):'<p class="empty">Kein Feedback.</p>'}
+      <div class="tiles">${Object.entries(A.tempo).map(([k,v])=>`<div class="tile"><b>${A.tN?pct(v/A.tN):'–'}</b><span>Tempo ${esc(k)} (${v})</span></div>`).join('')}</div></div>
+    <div class="card"><div><div class="eyebrow">Feed Forward</div><h2>Gewünschte Hilfe</h2></div>
+      ${(()=>{const e=Object.entries(A.helpCount).sort((a,b)=>b[1]-a[1]);if(!e.length)return '<p class="empty">Keine Wünsche.</p>';const mx=e[0][1];
+        return `<div class="bars">${e.map(([k,v])=>`<div class="br"><div class="lab">${esc(k)}</div><div class="track"><span class="bar" style="width:${(v/mx*100).toFixed(1)}%" tabindex="0" data-tip="${esc(k)}\n${v} Nennungen"></span></div><div class="val">${v}</div></div>`).join('')}</div>`})()}</div>
+  </section>
+  <section class="card"><div><div class="eyebrow">Offene Rückmeldungen · ${A.X.length}</div><h2>Top, Kritik, Wunsch</h2></div>
+    <div class="cols">${[['Top','Das war gut'],['Kritik','Das hat gestört'],['Wunsch','Das wünsche ich mir']].map(([k,h])=>{const it=A.X.filter(r=>String(r[k]||'').trim());
+      return `<div><h3>${h} (${it.length})</h3>${it.length?`<ul>${it.map(r=>`<li>${esc(r[k])}<small>${dCH(r.Datum)} · ${esc(r.Klasse)} · ${esc(r['Kürzel'])}</small></li>`).join('')}</ul>`:'<p class="empty">–</p>'}</div>`}).join('')}</div></section>
+  <section class="card"><div><div class="eyebrow">Einzelne Lernende · tiefste zuerst</div><h2>Wer braucht Unterstützung?</h2></div>
+    <div class="tw"><table><thead><tr><th>Kürzel</th><th>Klasse</th><th>Datum</th><th>Thema</th><th>Ø</th><th>Ziele &lt;4</th><th>Schwächstes Ziel</th></tr></thead><tbody>
+    ${A.students.map(s=>`<tr><td><b>${esc(s.kz)}</b></td><td>${esc(s.klasse)}</td><td>${dCH(s.datum)}</td><td>${esc(s.thema)}</td><td class="n ${s.avg<4?'low':''}">${f1(s.avg)}</td><td class="n ${s.under?'low':''}">${s.under}</td><td>${esc(s.low)} (${f1(s.lowv)})</td></tr>`).join('')}
+    </tbody></table></div></section>`;
+  $('cpy').onclick=()=>{const t=`LERNSTAND-CHECK · GESAMTAUSWERTUNG\n${$('fDate').value?dCH($('fDate').value):'Alle Daten'} · ${$('fKlasse').value||'Alle Klassen'} · ${$('fThema').value||'Alle Themen'}\n\n`+
+    [...document.querySelectorAll('.sum li')].map(li=>'• '+li.textContent).join('\n');
+    navigator.clipboard?.writeText(t).then(()=>$('cpyMsg').textContent='Kopiert.',()=>$('cpyMsg').textContent='Kopieren nicht möglich.')}}
+
+/* ---------- Tooltip ---------- */
+const tip=$('tip');
+function showTip(el,x,y){const lines=(el.dataset.tip||'').split('\n');tip.textContent='';
+  lines.forEach((l,i)=>{const n=document.createElement(i===1?'b':'div');n.textContent=l;tip.appendChild(n);if(i===1)tip.appendChild(document.createElement('br'))});
+  tip.style.display='block';const w=tip.offsetWidth,h=tip.offsetHeight;
+  tip.style.left=Math.min(innerWidth-w-8,Math.max(8,x+12))+'px';tip.style.top=Math.max(8,y-h-10)+'px'}
+document.addEventListener('pointermove',e=>{const b=e.target.closest?.('[data-tip]');b?showTip(b,e.clientX,e.clientY):tip.style.display='none'});
+document.addEventListener('focusin',e=>{const b=e.target.closest?.('[data-tip]');if(b){const r=b.getBoundingClientRect();showTip(b,r.right,r.top)}});
+document.addEventListener('focusout',()=>tip.style.display='none');
+
+/* ---------- Start ---------- */
+['fDate','fKlasse','fThema'].forEach(id=>$(id).onchange=render);
+$('load').onclick=load;$('reload').onclick=load;$('demo').onclick=demo;
+$('url').value=ls('lsd-url')||DEFAULT_URL;$('key').value=ls('lsd-key');
+fillFilters();
+if($('url').value&&$('key').value)load();else $('setup').open=true;
+</script>
+</body>
+</html>

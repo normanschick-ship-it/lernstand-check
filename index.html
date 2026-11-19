@@ -264,9 +264,12 @@ const HELP=["Nochmals erklären","Mehr Übungen","Am Fahrzeug zeigen","Lernvideo
 const TEXTS=[["fbTop","Das war gut.","z. B. Das Schnittmodell hat geholfen."],["fbKritik","Das hat mich gestört.","z. B. Der Theorieblock war zu lang."],["fbWunsch","Das wünsche ich mir.","z. B. Mehr Übungen vor der Prüfung."]];
 
 const LEK={A:2,B:3};
-let pick={A:null,B:null}, sc={}, lp, tempo, help, txt, kz, anon, step=0;
-function resetAll(){sc={};T.forEach(t=>sc[t.id]=Array(t.g.length).fill(null));lp={A:Array(5).fill(null),B:Array(5).fill(null)};tempo={A:null,B:null};help=new Set();txt={fbTop:"",fbKritik:"",fbWunsch:""};kz="";anon=false}
+/* Adresse der Google-Apps-Script-Web-App. Leer = nur Kopieren. */
+const ENDPOINT='';
+let pick={A:null,B:null}, sc={}, lp, tempo, help, txt, kz, anon, step=0, klasse='', pl=null, sent=false, warned=false;
+function resetAll(){sc={};T.forEach(t=>sc[t.id]=Array(t.g.length).fill(null));lp={A:Array(5).fill(null),B:Array(5).fill(null)};tempo={A:null,B:null};help=new Set();txt={fbTop:"",fbKritik:"",fbWunsch:""};kz="";anon=false;pl=null;sent=false;warned=false}
 resetAll();
+try{klasse=localStorage.getItem('lsc-klasse')||''}catch(e){}
 try{const s=JSON.parse(localStorage.getItem('lsc-pick')||'{}');['A','B'].forEach(k=>{if(T.some(t=>t.id===s[k]))pick[k]=s[k]})}catch(e){}
 const $=id=>document.getElementById(id);
 const byId=id=>T.find(t=>t.id===id);
@@ -297,7 +300,7 @@ function focus(t){const s0=sc[t.id];const gap=s0.findIndex(v=>v<4);
   if(s0.every(v=>v>=5.5)){const i=s0.indexOf(Math.min(...s0));return{i,why:'Alles sitzt. Erklär es einer Kollegin. So bleibt es hängen.'}}
   const i=s0.indexOf(Math.min(...s0));return{i,why:'Dein schwächstes Ziel. Hier holst du am meisten heraus.'}}
 const spuren=()=>['A','B'].filter(k=>pick[k]);
-function lernText(){const d=new Date().toLocaleDateString('de-CH');let t=`LERNSTAND-CHECK ${d} · Kürzel: ${kz}\n`;
+function lernText(){const d=new Date().toLocaleDateString('de-CH');let t=`LERNSTAND-CHECK ${d} · Klasse: ${klasse.trim()} · Kürzel: ${kz}\n`;
   topics().forEach(tp=>{t+=`\nSpur ${tp.spur} · ${tp.nr} ${tp.name} (${LEK[tp.spur]} Lekt.)\n`;tp.g.forEach((g,i)=>t+=`K${g[0]} ${g[1]}: ${fmt(sc[tp.id][i])}\n`)});
   return t+`\nHilfe gewünscht: ${help.size?[...help].join(', '):'–'}`}
 function lpText(){const d=new Date().toLocaleDateString('de-CH');let t=`FEEDBACK AN DIE LEHRPERSON ${d} · ${anon?'anonym':'Kürzel: '+kz}\n`;
@@ -327,14 +330,17 @@ function slides(){const S=[],TP=topics();
   /* 1 Kürzel */
   S.push({sec:'Start',html:()=>`<div class="eyebrow">BBW Winterthur · AFP · 5. Semester</div>
     <h1>Lernstand-Check</h1><p class="lead">Exit-Ticket. 5 Minuten. Keine Note.</p>
+    <div class="card"><h3>Deine Klasse</h3><p class="hint">Z. B. «AFP 23A».</p>
+    <input type="text" id="kl" maxlength="12" autocomplete="off" autocapitalize="characters" aria-label="Klasse"
+      style="font:inherit;font-weight:600;font-size:1.3rem;text-align:center;text-transform:uppercase;padding:10px;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--ink);width:100%"></div>
     <div class="card"><h3>Dein Namenskürzel</h3><p class="hint">2 bis 4 Buchstaben, z. B. «MK».</p>
     <input type="text" id="kz" maxlength="4" autocomplete="off" autocapitalize="characters" aria-label="Namenskürzel"
       style="font-family:var(--display);font-weight:700;font-size:2.6rem;text-align:center;letter-spacing:.15em;text-transform:uppercase;padding:10px;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--ink);width:100%"></div>
     <label class="card" for="anon" style="flex-direction:row;align-items:flex-start;gap:12px;cursor:pointer">
       <input type="checkbox" id="anon" style="width:24px;height:24px;accent-color:var(--accent);flex:0 0 auto;margin-top:2px">
       <span><b>Feedback an die LP anonym</b><br><span class="hint">Dein Kürzel steht dann nur beim Lernstand.</span></span></label>`,
-    bind:()=>{const i=$('kz'),c=$('anon');i.value=kz;c.checked=anon;i.oninput=()=>{kz=i.value.toUpperCase().replace(/[^A-ZÄÖÜ]/g,'');i.value=kz;$('err').textContent=''};c.onchange=()=>anon=c.checked},
-    ok:()=>kz.length>=2?'':'Gib dein Kürzel ein (mind. 2 Buchstaben).'});
+    bind:()=>{const i=$('kz'),c=$('anon'),l=$('kl');l.value=klasse;l.oninput=()=>{klasse=l.value.toUpperCase().replace(/[^A-Z0-9ÄÖÜ .\-]/g,'').replace(/\s+/g,' ');l.value=klasse;try{localStorage.setItem('lsc-klasse',klasse.trim())}catch(e){};$('err').textContent=''};i.value=kz;c.checked=anon;i.oninput=()=>{kz=i.value.toUpperCase().replace(/[^A-ZÄÖÜ]/g,'');i.value=kz;$('err').textContent=''};c.onchange=()=>anon=c.checked},
+    ok:()=>klasse.trim().length<2?'Gib deine Klasse ein.':kz.length>=2?'':'Gib dein Kürzel ein (mind. 2 Buchstaben).'});
   /* 2 Themen */
   S.push({sec:'Themen',html:()=>`<span class="tag">Themen von heute</span><h2>Was hattet ihr heute?</h2><p class="hint">Wähl pro Spur ein Thema.</p>
     ${['A','B'].map(k=>`<div class="card"><div class="spur-h">Spur ${k} · ${k==='A'?'Motor':'Bremse / Antrieb / Elektro'} · ${LEK[k]} Lekt.</div><div class="chips">${
@@ -379,23 +385,39 @@ function slides(){const S=[],TP=topics();
     <div class="tx" style="display:flex;flex-direction:column;gap:6px">${TEXTS.map(([id,h,ph])=>`<label class="tl" for="${id}">${h}</label><textarea id="${id}" placeholder="${ph}"></textarea>`).join('')}</div>`,
     bind:()=>TEXTS.forEach(([id])=>{const ta=$(id);ta.value=txt[id];ta.oninput=()=>txt[id]=ta.value})});
   /* 12 Exit-Ticket */
-  S.push({sec:'Exit-Ticket',html:()=>{const rows=[["Datum",new Date().toLocaleDateString('de-CH')],["Kürzel",kz]];
+  S.push({sec:'Exit-Ticket',html:()=>{const rows=[["Datum",new Date().toLocaleDateString('de-CH')],["Klasse",klasse.trim()],["Kürzel",kz]];
       TP.forEach(t=>{rows.push([`<b>Spur ${t.spur}</b>`,`<b>${t.nr} ${t.name}</b>`]);t.g.forEach((g,i)=>rows.push([`K${g[0]} ${g[1]}`,fmt(sc[t.id][i])]))});
       rows.push(["Hilfe",help.size?[...help].join(', '):'–'],["Feedback an LP",anon?'anonym':'mit Kürzel']);
     return `<span class="tag">Fertig</span><h2>Dein Exit-Ticket</h2><div class="ticket">${rows.map(r=>`<div class="row"><span>${r[0]}</span><span>${r[1]}</span></div>`).join('')}</div>
-    ${anon?`<button class="btn primary" type="button" id="copy1">1 · Lernstand kopieren</button>
-      <button class="btn primary" type="button" id="copy2">2 · Feedback kopieren (anonym)</button>`
-      :`<button class="btn primary" type="button" id="copy">Alles kopieren</button>`}
-    <span id="copied" aria-live="polite"></span>
-    <p class="hint">${anon?'Zwei Texte. Getrennt senden. Feedback ins anonyme Formular.':'Text einfügen, wo die Lehrperson es sagt.'} Screenshot fürs Lernjournal.</p>
+    ${ENDPOINT?`<button class="btn primary" type="button" id="send" ${sent?'disabled':''}>${sent?'Gesendet ✓':'Senden'}</button>`:''}
+    ${ENDPOINT?'<details class="card"><summary>Reserve: Text kopieren</summary>':''}
+    ${anon?`<button class="btn ${ENDPOINT?'':'primary'}" type="button" id="copy1">1 · Lernstand kopieren</button>
+      <button class="btn ${ENDPOINT?'':'primary'}" type="button" id="copy2">2 · Feedback kopieren (anonym)</button>`
+      :`<button class="btn ${ENDPOINT?'':'primary'}" type="button" id="copy">Alles kopieren</button>`}
+    ${ENDPOINT?'</details>':''}
+    <span id="copied" aria-live="polite">${sent?'Danke! Deine Antworten sind bei der Lehrperson.':''}</span>
+    <p class="hint">${ENDPOINT?'Drück «Senden». Fertig.':anon?'Zwei Texte. Getrennt senden. Feedback ins anonyme Formular.':'Text einfügen, wo die Lehrperson es sagt.'} Screenshot fürs Lernjournal.</p>
     <details class="card"><summary>Für die Lehrperson: Einordnung</summary><div class="tw"><table class="info">
       <tr><td>Hattie</td><td>Feed Up = Leistungsziel · Feed Back = Regler und Netz · Feed Forward = nächster Schritt mit Quelle · Vorschau</td></tr>
       <tr><td>Taxonomie</td><td>K-Stufe nach Verb im BBW-Lehrplan: nennen K1, erklären/beschreiben K2, rechnen/austauschen K3</td></tr>
       <tr><td>Umfang</td><td>max. 12 Seiten, ca. 5 Min.</td></tr>
       <tr><td>Sozialform</td><td>Einzelarbeit am Smartphone (BYOD)</td></tr>
       <tr><td>Transparenz</td><td>Lernende entscheiden über die Weitergabe</td></tr></table></div></details>`},
-    bind:()=>{if(anon){copyBtn('copy1',lernText);copyBtn('copy2',lpText)}else copyBtn('copy',()=>lernText()+'\n\n'+lpText())}});
+    bind:()=>{if(ENDPOINT)$('send').onclick=senden;if(anon){copyBtn('copy1',lernText);copyBtn('copy2',lpText)}else copyBtn('copy',()=>lernText()+'\n\n'+lpText())}});
   return S}
+function iso(d){const p=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`}
+function payloads(){const now=new Date(),datum=iso(now),zeit=`${datum}T${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  const rid=()=>Math.random().toString(36).slice(2,10)+Date.now().toString(36),k=klasse.trim();
+  const lern={type:'lern',id:rid(),zeit,datum,klasse:k,kz,hilfe:[...help].join(', '),rows:[]};
+  topics().forEach(t=>t.g.forEach((g,i)=>lern.rows.push([t.spur,t.nr,t.name,'K'+g[0],g[1],sc[t.id][i]])));
+  const fbp={type:'fb',id:rid(),datum,klasse:k,kz:anon?'':kz,anon,top:txt.fbTop.trim(),kritik:txt.fbKritik.trim(),wunsch:txt.fbWunsch.trim(),
+    rows:spuren().map(s=>[s,byId(pick[s]).name,...lp[s],tempo[s]])};
+  return [lern,fbp]}
+async function senden(){const b=$('send');b.disabled=true;b.textContent='Wird gesendet …';
+  try{if(!pl)pl=payloads();
+    for(const p of pl)await fetch(ENDPOINT,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(p)});
+    sent=true;b.textContent='Gesendet ✓';$('copied').textContent='Danke! Deine Antworten sind bei der Lehrperson.';$('err').textContent=''}
+  catch(e){b.disabled=false;b.textContent='Nochmals senden';$('copied').textContent='Senden ging nicht. Prüf das Internet oder kopier den Text.'}}
 function fb(t){const a=document.createElement('textarea');a.value=t;$('copied').textContent='Text unten markieren und kopieren:';$('copied').after(a);a.select()}
 function updateBar(){const S=slides(),pct=Math.round(step/(S.length-1)*100);$('fill').style.width=pct+'%';$('track').setAttribute('aria-valuenow',pct);
   $('sec').textContent=S[step].sec;$('count').textContent=`${step+1} / ${topics().length?S.length:12}`;
@@ -403,7 +425,7 @@ function updateBar(){const S=slides(),pct=Math.round(step/(S.length-1)*100);$('f
 function go(n){const S=slides();step=Math.max(0,Math.min(n,S.length-1));const s=S[step];
   $('slide').innerHTML=s.html();s.bind&&s.bind();$('err').textContent='';updateBar();window.scrollTo({top:0})}
 $('next').onclick=()=>{const S=slides(),s=S[step];
-  if(step===S.length-1){resetAll();go(0);return}
+  if(step===S.length-1){if(ENDPOINT&&!sent&&!warned){warned=true;$('err').textContent='Du hast noch nicht gesendet. Nochmals tippen = trotzdem neu beginnen.';return}resetAll();go(0);return}
   const e=s.ok?s.ok():'';if(e){$('err').textContent=e;return}go(step+1)};
 $('back').onclick=()=>go(step-1);
 go(0);
